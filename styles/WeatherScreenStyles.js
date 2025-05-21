@@ -164,6 +164,7 @@ const styles = StyleSheet.create({
     footerButtonText: {
         color: '#3498db',
         fontWeight: '500',
+        fontWeight: '600',
     },
     disabledText: {
         color: '#ccc',
@@ -183,6 +184,7 @@ const styles = StyleSheet.create({
     logoutText: {
         marginLeft: 5,
         color: '#666',
+        fontWeight: '600',
     },
     spacer: {
         height: 20,

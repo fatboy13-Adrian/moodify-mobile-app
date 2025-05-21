@@ -4,6 +4,7 @@ import {
     View,
     TouchableOpacity,
     TextInput,
+    Button,
     ActivityIndicator,
     SafeAreaView,
     ScrollView,
@@ -438,6 +439,12 @@ const WeatherApp = () => {
                     </View>
                 )}
                 <View style={styles.spacer}></View>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => navigation.navigate('Activity')}
+                    >
+                        <Text style={styles.buttonText}>Go to Activity Screen</Text>
+                    </TouchableOpacity>
             </ScrollView>            
     
             {/* Fixed footer - always at bottom */}
