@@ -22,6 +22,7 @@ Moodify mobile app helps users build and maintain positive habits by recommendin
 
 3. **Install Dependencies:**<br>
    npm install<br>
+   npm install expo<br>
    npm install react-hook-form<br>
    npm install @expo/vector-icons<br>
    npm install @react-navigation/native<br>

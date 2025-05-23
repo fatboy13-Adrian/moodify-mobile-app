@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: '#2c3e50',
   },
-  secondHeader: {
+  subHeader: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 40,

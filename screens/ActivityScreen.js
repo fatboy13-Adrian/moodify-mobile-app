@@ -49,7 +49,7 @@ export default function ActivityScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle={"light-content"} />
+            <StatusBar barStyle={"dark-content"} />
 
             {/* Header Section */}
             <View style={styles.headerContainer}>
