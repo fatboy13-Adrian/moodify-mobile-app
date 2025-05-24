@@ -62,6 +62,7 @@ export default function ActivityScreen() {
                 <Text style={styles.sectionTitle}>How's the weather today?</Text>
 
                 <View style={styles.buttonRow}>
+                    {/* Get activities for sunny weather */}
                     <TouchableOpacity
                         style={[
                             styles.weatherButton,
@@ -73,6 +74,7 @@ export default function ActivityScreen() {
                         <Text style={[styles.buttonText, weather === 'sunny' ? { color: '#FFF' } : {}]}>Sunny</Text>
                     </TouchableOpacity>
 
+                     {/* Get activities for rainy weather */}
                     <TouchableOpacity
                         style={[
                             styles.weatherButton,
@@ -121,4 +123,3 @@ export default function ActivityScreen() {
         </SafeAreaView>
     );
 }
-

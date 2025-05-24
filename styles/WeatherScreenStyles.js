@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     disabledButton: {
-        backgroundColor: '#bdc3c7',
+        backgroundColor: 'white',
     },
     updateButtonText: {
         color: 'white',
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     disabledText: {
-        color: '#ccc',
+        color: 'white',
     },
     forecastSummary: {
         fontSize: 14,

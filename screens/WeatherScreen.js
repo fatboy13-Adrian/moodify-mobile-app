@@ -15,6 +15,14 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import styles from '../styles/WeatherScreenStyles';
+import { 
+    formatTemperature, 
+    formatHumidity, 
+    formatWindSpeed, 
+    formatDate, 
+    formatTime, 
+    isToday 
+} from '../utilities/WeatherUtils';
 
 const WeatherApp = () => {
     const navigation = useNavigation();
@@ -27,82 +35,6 @@ const WeatherApp = () => {
     const [showAreaModal, setShowAreaModal] = useState(null);
     const [selectedArea, setSelectedArea] = useState(null);
     const [areas, setAreas] = useState([]);
-
-    // Helper function to format temperature
-    const formatTemperature = (temp) => temp ? `${temp}°C` : 'N/A';
-
-    // Helper function to format humidity
-    const formatHumidity = (humidity) => humidity ? `${humidity}%` : 'N/A';
-
-    // Helper functon to format wind speed
-    const formatWindSpeed = (speed) => speed ? `${speed} km/h` : 'N/A';
-    
-    // Helper function to format date
-    const formatDate = (timestamp) => {
-        if (!timestamp) return new Date().toLocaleDateString('en-SG', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-
-        try {
-            // Ensure the timestamp is parsed correctly
-            const date = new Date(timestamp);
-            if (isNaN(date.getTime())) {
-                throw new Error('Invalid timestamp');
-            }
-            return date.toLocaleDateString('en-SG', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        } catch (error) {
-            console.warn('Date formatting error:', error);
-            // Return current date as fallback
-            return new Date().toLocaleDateString('en-SG', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-    };
-
-    // Helper function to format time
-    const formatTime = (timestamp) => {
-        if (!timestamp) return '';
-
-        try {
-            // Handle both ISO strings and Unix timestamps
-            const date = timestamp.length > 13 ? new Date(timestamp) : new Date(parseInt(timestamp));
-
-            if (isNaN(date.getTime())) {
-                console.warn('Invalid timestamp: ' , timestamp);
-                return '';
-            }
-
-            // Format for Singapore timezone (GMT+8)
-            return date.toLocaleTimeString('en-SG', {
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Asia/Singapore',
-                hour12: false
-            });
-        } catch (error) {
-            console.warn('Time formatting error:', error, 'Timestamp:', timestamp);
-            return '';
-        }
-    };
-
-    // Helper function to determine if forecast is for today
-    const isToday =(timestamp) => {
-        if (!timestamp) return true;
-        const forecastDate = new Date(timestamp);
-        const today = new Date();
-        return forecastDate.toDateString() === today.toDateString();
-    };
 
     // Function to fetch area-specific forecasts from data.gov.sg API
     const fetchAreaData = async () => {
@@ -117,20 +49,21 @@ const WeatherApp = () => {
             const data = await response.json();
             console.log("Full API Response:", JSON.stringify(data, null, 2));
             
-            // Validate amd extract data more carefully
+            // Validate and extract data more carefully
             const validPeriod = data?.data?.items?.[0]?.valid_period || {};
             console.log("Raw Valid Period:", validPeriod);
 
             // Process the timestamps
-            const processTimestamp = (ts) => {
-                if (!ts) return null;
+            const processTimestamp = (timeStamp) => {
+                if (!timeStamp) return null;
                 // Try to detect if it's a Unix timestamp (in seconds)
-                if (/^\d+$/.test(ts)) {
-                    return new Date(parseInt(ts) * 1000).toISOString();
+                if (/^\d+$/.test(timeStamp)) {
+                    return new Date(parseInt(timeStamp) * 1000).toISOString();
                 }
-                return ts;
+                return timeStamp;
             } ;
 
+            // Process start and end time
             const processedStart = processTimestamp(validPeriod.start);
             const processedEnd = processTimestamp(validPeriod.end);
 
@@ -244,6 +177,7 @@ const WeatherApp = () => {
             // Store all forecasts for potential future use
             allForecasts: forecasts,
 
+            // Today's timestamp
             isToday: isToday(todayForecast?.timestamp)
         };
     };
@@ -298,7 +232,7 @@ const WeatherApp = () => {
         setError(null);
     };
 
-    // Function to update general location
+    // Function to update specific location
     const updateLocation = () => {
         const trimmedLocation = location.trim();
 
@@ -491,7 +425,7 @@ const WeatherApp = () => {
                             {selectedArea && weatherData.areaForecast && (
                                 <View style={styles.areaForecastContainer}>
                                     <Text style={styles.areaForecastTitle}>
-                                        Today's 2-Hour Forecast
+                                        Today's 2-Hourly Forecast
                                     </Text>
                                     <Text style={styles.areaForecastText}>
                                         {weatherData.areaForecast}
@@ -573,6 +507,8 @@ const WeatherApp = () => {
                             )}
                         </View>
                     )}
+
+                    {/* Activity screen button */}
                     <View style={styles.spacer}></View>
                         <TouchableOpacity
                             style={styles.button}
