@@ -1,3 +1,6 @@
+// JavaScript for weather screen styles
+// WeatherScreenStyles.js
+
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({

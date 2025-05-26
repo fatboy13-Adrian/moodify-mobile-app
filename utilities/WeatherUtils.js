@@ -1,3 +1,6 @@
+// JavaScript for weather utilities
+// WeatherUtils.js
+
 // Helper function to format temperature
 export const formatTemperature = (temp) => temp ? `${temp}°C` : 'N/A';
 

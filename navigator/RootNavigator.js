@@ -1,3 +1,6 @@
+// JavaScript for root navigator
+// RootNavigator.js
+
 import { createRef } from 'react';
 
 export const navigationRef = createRef();

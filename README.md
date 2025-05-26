@@ -31,7 +31,7 @@ Moodify mobile app helps users build and maintain positive habits by recommendin
    npm install @react-navigation/stack<br>
 
 4. **Run the Application:**<br>
-   npm expo start
+   npx expo start
 
 5. **Start Android Emulator:**<br>
    Select "a" to launch the app from Android Emulator  

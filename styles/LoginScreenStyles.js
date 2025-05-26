@@ -1,3 +1,6 @@
+// JavaScript for login screen styles
+// LoginScreenStyles.js
+
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({

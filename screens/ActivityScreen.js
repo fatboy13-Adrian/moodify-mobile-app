@@ -1,3 +1,6 @@
+// JavaScript for activity screen
+// ActivityScreen.js
+
 import { useState } from 'react';
 import {
     Text,
@@ -6,11 +9,11 @@ import {
     SafeAreaView,
     FlatList,
     StatusBar,
-    Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import styles from '../styles/ActivityScreenStyles';
+import handleLogout from '../utilities/LogoutUtils';
 
 export default function ActivityScreen() {
     const navigation = useNavigation();
@@ -24,27 +27,6 @@ export default function ActivityScreen() {
     const icons = {
         sunny: 'sun',
         rainy: 'cloud-rain'
-    };
-
-    // Function to log out of application
-    const handleLogout = () => {
-        Alert.alert(
-            "Logout",
-            "Are you sure you want to logout?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
-                {
-                    text: "Logout",
-                    onPress: () => {
-                        // Navigate to the login screen
-                        navigation.navigate('Login');
-                    }
-                }
-            ]
-        );
     };
 
     return (
@@ -113,7 +95,7 @@ export default function ActivityScreen() {
                 {/* Log out */}
                 <TouchableOpacity 
                     style={styles.logoutButton}
-                    onPress={handleLogout}    
+                    onPress={() => handleLogout(navigation)}    
                 >
                     <Feather name="log-out" size={16} color="#666" />
                     <Text style={styles.logoutText}>logout</Text>

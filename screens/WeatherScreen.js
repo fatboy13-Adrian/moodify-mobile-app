@@ -1,3 +1,6 @@
+// JavaScript for weather screen
+// WeatherScreen.js
+
 import { useState, useEffect } from 'react';
 import {
     Text,
@@ -23,6 +26,7 @@ import {
     formatTime, 
     isToday 
 } from '../utilities/WeatherUtils';
+import handleLogout from '../utilities/LogoutUtils';
 
 const WeatherApp = () => {
     const navigation = useNavigation();
@@ -39,7 +43,7 @@ const WeatherApp = () => {
     // Function to fetch area-specific forecasts from data.gov.sg API
     const fetchAreaData = async () => {
         try {
-            // Fetch 2-hour weather forecase for specific areas
+            // Fetch 2-hour weather forecast for specific areas
             const response = await fetch('https://api-open.data.gov.sg/v2/real-time/api/two-hr-forecast');
 
             if (!response.ok) {
@@ -125,14 +129,26 @@ const WeatherApp = () => {
         setShowAreaModal(false);
     };
 
+    // Helper function to get forecast display label
+    const getForecastDisplayLabel = (forecast, index, totalForecasts) => {
+        if (index === 0) {
+            return 'Today';
+        } else if (index === 1) {
+            return 'Tomorrow';
+        } else {
+            return forecast.day;
+        }
+    };
+
     // Function to process weather forecast data
-    const processWeatherData = (forecasts) => {
+    const processWeatherData = (forecasts, updatedTimestamp) => {
         if (!forecasts || forecasts.length === 0) {
             throw new Error('No forecast data available');
         }
 
-        // Get today's forecast (first item in the array)
-        const todayForecast = forecasts[0];
+        // Get the first forecast (tomorrow's forecast since API provides future dates)
+        const firstForecast = forecasts[0];
+        const today = new Date();
 
         return {
             // Location
@@ -140,45 +156,51 @@ const WeatherApp = () => {
 
             // Temperature
             temperature: {
-                min: formatTemperature(todayForecast?.temperature?.low),
-                max: formatTemperature(todayForecast?.temperature?.high),
+                min: formatTemperature(firstForecast?.temperature?.low),
+                max: formatTemperature(firstForecast?.temperature?.high),
             },
 
             // Humidity
             humidity: {
-                min: formatHumidity(todayForecast?.relativeHumidity?.low),
-                max: formatHumidity(todayForecast?.relativeHumidity?.high),
+                min: formatHumidity(firstForecast?.relativeHumidity?.low),
+                max: formatHumidity(firstForecast?.relativeHumidity?.high),
             },
 
             // Forecast
-            forecast: todayForecast?.forecast?.text || 'No forecast available',
+            forecast: firstForecast?.forecast?.text || 'No forecast available',
             
             // Forecast Summary
-            forecastSummary: todayForecast?.forecast?.summary || '',
+            forecastSummary: firstForecast?.forecast?.summary || '',
             
             // Windspeed
             windSpeed: {
-                min: formatWindSpeed(todayForecast?.wind?.speed?.low),
-                max: formatWindSpeed(todayForecast?.wind?.speed?.high),
+                min: formatWindSpeed(firstForecast?.wind?.speed?.low),
+                max: formatWindSpeed(firstForecast?.wind?.speed?.high),
             },
 
             // Wind Direction
-            windDirection: todayForecast?.wind?.direction || '',
+            windDirection: firstForecast?.wind?.direction || '',
             
-            // Last updated date
-            lastUpdated: formatDate(new Date().toISOString()),
+            // Last updated date - use the API's updated timestamp or current time
+            lastUpdated: updatedTimestamp ? formatDate(updatedTimestamp) : formatDate(new Date().toISOString()),
             
-            // Date
-            date: formatDate(todayForecast?.timestamp),
+            // Date - use today's date for display, not the forecast timestamp
+            date: formatDate(today.toISOString()),
             
-            // Day
-            day: todayForecast?.day || '',
+            // Day - use current day
+            day: getForecastDisplayLabel(firstForecast, 0, forecasts.length),
             
             // Store all forecasts for potential future use
             allForecasts: forecasts,
 
-            // Today's timestamp
-            isToday: isToday(todayForecast?.timestamp)
+            // Current forecast index for display
+            currentIndex: 0,
+
+            // Today indicator - always true for the initial display
+            isToday: true,
+
+            // API updated timestamp
+            apiUpdatedTime: updatedTimestamp
         };
     };
 
@@ -207,9 +229,12 @@ const WeatherApp = () => {
             const record = responseData.data.records[0];
             const forecasts = record.forecasts;
 
-            // Process weather data
+            // Process weather data with the API's updated timestamp
             const processedData = processWeatherData(forecasts, record.updatedTimestamp);
             setWeatherData(processedData);
+
+            // Reset forecast index when fteching new data
+            setCurrentForecastIndex(0);
 
             // Fetch area-specific data
             await fetchAreaData();
@@ -278,33 +303,16 @@ const WeatherApp = () => {
         }
     };
 
-    // Function to log out of application
-    const handleLogout = () => {
-        Alert.alert(
-            "Logout",
-            "Are you sure you want to logout?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
-                {
-                    text: "Logout",
-                    onPress: () => {
-                        // Navigate to the login screen
-                        navigation.navigate('Login');
-                    }
-                }
-            ]
-        );
-    };
-
     // Update display with selected forecast day
     useEffect(() => {
         if (weatherData?.allForecasts && weatherData.allForecasts.length > 0) {
             const selectedForecast = weatherData.allForecasts[currentForecastIndex];
 
             if (selectedForecast) {
+                // Calculate the display date based on current forecast index
+                const today = new Date();
+                const displayDate = new Date(today);
+                displayDate.setDate(today.getDate() + currentForecastIndex);
 
                 setWeatherData(prevData => ({
                     ...prevData,
@@ -323,13 +331,16 @@ const WeatherApp = () => {
                         max: formatWindSpeed(selectedForecast?.wind?.speed?.high),
                     },
                     windDirection: selectedForecast?.wind?.direction || 'N/A',
-                    date: formatDate(selectedForecast.timestamp),
-                    day: selectedForecast.day || '',
-                    isToday: isToday(selectedForecast.timestamp)
+                    // Use calculated display date instead of forecast timestamp
+                    date: formatDate(displayDate.toISOString()),
+                    day: getForecastDisplayLabel(selectedForecast, currentForecastIndex, weatherData.allForecasts.length),
+                    // Only today (index 0) should be marked as isToday
+                    isToday: currentForecastIndex === 0,
+                    currentIndex: currentForecastIndex
                 }));
 
-                // Update area forecast if area is selected
-                if (selectedArea) {
+                // Update area forecast if area is selected (only for today's forecast)
+                if (selectedArea && currentForecastIndex === 0) {
                     updateSelectedAreaWeather(selectedArea);
                 }
             }
@@ -421,8 +432,8 @@ const WeatherApp = () => {
                                 <Feather name="cloud" size={20} /> Weather in {weatherData.location}
                             </Text>
 
-                            {/* Display area-specific 2-hourly weather forecast if available */}
-                            {selectedArea && weatherData.areaForecast && (
+                            {/* Display area-specific 2-hourly weather forecast if available (only for today) */}
+                            {selectedArea && weatherData.areaForecast && weatherData.isToday && (
                                 <View style={styles.areaForecastContainer}>
                                     <Text style={styles.areaForecastTitle}>
                                         Today's 2-Hourly Forecast
@@ -539,7 +550,7 @@ const WeatherApp = () => {
                     {/* Log out */}
                     <TouchableOpacity 
                         style={styles.logoutButton}
-                        onPress={handleLogout}    
+                        onPress={()=> handleLogout(navigation)}    
                     >
                         <Feather name="log-out" size={16} color="#666" />
                         <Text style={styles.logoutText}>logout</Text>

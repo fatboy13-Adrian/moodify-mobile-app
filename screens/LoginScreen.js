@@ -1,3 +1,6 @@
+// JavaScript for login screen
+// LoginScreen.js
+
 import { 
     View, 
     TextInput, 
