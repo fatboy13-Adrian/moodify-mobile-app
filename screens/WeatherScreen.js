@@ -24,7 +24,6 @@ import {
     formatWindSpeed, 
     formatDate, 
     formatTime, 
-    isToday 
 } from '../utilities/WeatherUtils';
 import handleLogout from '../utilities/LogoutUtils';
 
@@ -129,17 +128,6 @@ const WeatherApp = () => {
         setShowAreaModal(false);
     };
 
-    // Helper function to get forecast display label
-    const getForecastDisplayLabel = (forecast, index, totalForecasts) => {
-        if (index === 0) {
-            return 'Today';
-        } else if (index === 1) {
-            return 'Tomorrow';
-        } else {
-            return forecast.day;
-        }
-    };
-
     // Function to process weather forecast data
     const processWeatherData = (forecasts, updatedTimestamp) => {
         if (!forecasts || forecasts.length === 0) {
@@ -186,10 +174,7 @@ const WeatherApp = () => {
             
             // Date - use today's date for display, not the forecast timestamp
             date: formatDate(today.toISOString()),
-            
-            // Day - use current day
-            day: getForecastDisplayLabel(firstForecast, 0, forecasts.length),
-            
+                        
             // Store all forecasts for potential future use
             allForecasts: forecasts,
 
@@ -333,7 +318,6 @@ const WeatherApp = () => {
                     windDirection: selectedForecast?.wind?.direction || 'N/A',
                     // Use calculated display date instead of forecast timestamp
                     date: formatDate(displayDate.toISOString()),
-                    day: getForecastDisplayLabel(selectedForecast, currentForecastIndex, weatherData.allForecasts.length),
                     // Only today (index 0) should be marked as isToday
                     isToday: currentForecastIndex === 0,
                     currentIndex: currentForecastIndex
