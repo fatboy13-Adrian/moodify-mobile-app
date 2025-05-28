@@ -1,3 +1,6 @@
+// JavaScript for drawer navigator
+// DrawerNavigator.js
+
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import WeatherScreen from "../screens/WeatherScreen";
 import ActivityScreen from "../screens/ActivityScreen";

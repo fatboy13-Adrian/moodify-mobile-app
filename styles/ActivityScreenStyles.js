@@ -1,3 +1,6 @@
+// JavaScript for activity screen styles
+// ActivityScreenStyles.js
+
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
